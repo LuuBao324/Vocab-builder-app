@@ -4,6 +4,11 @@ module.exports = (app) => {
         .route('/words')
         .get(vocabBuilder.list_all_words)
         .post(vocabBuilder.create_a_word);
+
+    app
+        .route('/search')
+        .get(vocabBuilder.search_words);
+
     app
         .route('/words/:wordId')
         .get(vocabBuilder.read_a_word)

@@ -12,6 +12,7 @@ Vue.use(VueFlashMessage, {
 
 const vm = new Vue();
 const baseURL = 'http://localhost:3000/words/';
+const searchURL = 'http://localhost:3000/search';
 
 const handleError = fn => (...params) =>
     fn(...params).catch(error => {
@@ -23,8 +24,16 @@ export const api = {
         const res = await axios.get(baseURL + id);
         return res.data;
     }),
-    getWords: handleError(async () => {
-        const res = await axios.get(baseURL);
+    getWords: handleError(async sort => {
+        // sort: optional string. If provided, appended as ?sort=<value>
+        const url = sort ? `${baseURL}?sort=${encodeURIComponent(sort)}` : baseURL;
+        const res = await axios.get(url);
+        return res.data;
+    }),
+    searchWords: handleError(async query => {
+        const trimmed = query ? query.trim() : '';
+        if (!trimmed) return [];
+        const res = await axios.get(`${searchURL}?q=${encodeURIComponent(trimmed)}`);
         return res.data;
     }),
     deleteWord: handleError(async id => {

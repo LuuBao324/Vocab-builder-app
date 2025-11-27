@@ -6,14 +6,27 @@ const vocabSchema = new Schema(
     {
         english: {
             type: String,
-            required: 'English word is required'
+            required: [true, 'English word is required'],
+            trim: true,
+            minlength: [1, 'English word cannot be empty']
         },
         german: {
             type: String,
-            required: 'German word is required'
+            required: [true, 'German word is required'],
+            trim: true,
+            minlength: [1, 'German word cannot be empty']
+        },
+        vietnamese: {
+            type: String,
+            required: [true, 'Vietnamese word is required'],
+            trim: true,
+            minlength: [1, 'Vietnamese word cannot be empty']
         }
     },
-    {collection: 'vocab'}
+    {
+        collection: 'vocab3',
+        timestamps: true
+    }
 );
 
 module.exports = mongoose.model('Vocab', vocabSchema);
