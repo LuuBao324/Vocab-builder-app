@@ -136,7 +136,11 @@ export default {
         this.score += 1;
       } else {
         this.flash(`Wrong! Correct answer: ${this.currWord.english}`, 'error', { timeout: 1500 });
-        this.incorrectGuesses.push(this.currWord.german);
+        this.incorrectGuesses.push({
+          english: this.currWord.english,
+          german: this.currWord.german,
+          vietnamese: this.currWord.vietnamese
+        });
       }
 
       this.selectedOption = '';
@@ -157,8 +161,22 @@ export default {
         return;
       }
 
-      const incorrect = this.incorrectGuesses.join(', ');
-      this.result = `<strong>You got the following words wrong:</strong> ${incorrect}`;
+      const incorrectList = this.incorrectGuesses
+        .map(word => `
+          <li>
+            <strong>English:</strong> ${word.english}
+            <span class="bullet-separator">—</span>
+            <strong>German:</strong> ${word.german}
+            <span class="bullet-separator">||</span>
+            <strong>Vietnamese:</strong> ${word.vietnamese}
+          </li>
+        `)
+        .join('');
+
+      this.result = `
+        <strong>You got the following words wrong:</strong>
+        <ul class="incorrect-list">${incorrectList}</ul>
+      `;
       this.resultClass = 'error';
     }
   }
@@ -223,6 +241,18 @@ export default {
   margin: 25px auto;
   padding: 15px;
   border-radius: 5px;
+}
+
+.incorrect-list {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+
+.bullet-separator {
+  display: inline-block;
+  margin: 0 0.35rem;
+  color: #666;
 }
 
 .error {
