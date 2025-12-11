@@ -66,7 +66,7 @@
 import { api } from '../helpers/helpers';
 
 export default {
-    name: 'Words',
+    name: 'words',
     data() {
         return {
             words: [],
@@ -78,7 +78,6 @@ export default {
     },
     methods: {
         async fetchWords() {
-            // pass sortOrder to API helper which will append query param
             this.words = await api.getWords(this.sortOrder);
             this.isSearching = false;
         },

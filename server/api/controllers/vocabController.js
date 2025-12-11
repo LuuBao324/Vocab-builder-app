@@ -42,14 +42,11 @@ const cosineSimilarity = (vecA, vecB) => {
 };
 
 exports.list_all_words = (req, res) => {
-    // support optional sort query param: ?sort=recent (default) or ?sort=old
     const sortParam = (req.query.sort || 'recent').toLowerCase();
     let sortObj = {};
     if (sortParam === 'old' || sortParam === 'old-to-new' || sortParam === 'old_to_new') {
-        // ascending by updatedAt (oldest first)
         sortObj = { updatedAt: 1 };
     } else {
-        // default: most recently updated first
         sortObj = { updatedAt: -1 };
     }
 

@@ -25,7 +25,6 @@ export const api = {
         return res.data;
     }),
     getWords: handleError(async sort => {
-        // sort: optional string. If provided, appended as ?sort=<value>
         const url = sort ? `${baseURL}?sort=${encodeURIComponent(sort)}` : baseURL;
         const res = await axios.get(url);
         return res.data;
