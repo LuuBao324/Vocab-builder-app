@@ -11,40 +11,10 @@ const normalize = text => {
         .toLowerCase();
 };
 
-const tokenize = text => {
-    const normalized = normalize(text);
-    if (!normalized) return [];
-    return normalized.split(/\s+/).filter(Boolean);
-};
-
-const buildVector = tokens => {
-    return tokens.reduce((vector, token) => {
-        vector[token] = (vector[token] || 0) + 1;
-        return vector;
-    }, {});
-};
-
-const cosineSimilarity = (vecA, vecB) => {
-    const keys = new Set([...Object.keys(vecA), ...Object.keys(vecB)]);
-    if (!keys.size) return 0;
-    let dot = 0;
-    let magA = 0;
-    let magB = 0;
-    keys.forEach(key => {
-        const a = vecA[key] || 0;
-        const b = vecB[key] || 0;
-        dot += a * b;
-        magA += a * a;
-        magB += b * b;
-    });
-    if (!magA || !magB) return 0;
-    return dot / (Math.sqrt(magA) * Math.sqrt(magB));
-};
-
 exports.list_all_words = (req, res) => {
     const sortParam = (req.query.sort || 'recent').toLowerCase();
     let sortObj = {};
-    if (sortParam === 'old' || sortParam === 'old-to-new' || sortParam === 'old_to_new') {
+    if (sortParam === 'old') {
         sortObj = { updatedAt: 1 };
     } else {
         sortObj = { updatedAt: -1 };
@@ -101,23 +71,14 @@ exports.search_words = (req, res) => {
 
     Vocab.find({}, (err, words) => {
         if (err) return res.status(500).send(err);
-
         const normalizedQuery = normalize(query);
-        const queryVector = buildVector(normalizedQuery.split(/\s+/).filter(Boolean));
-        const scored = words
-            .map(word => {
-                const combined = [word.english, word.german, word.vietnamese].join(' ');
-                const normalizedCombined = normalize(combined);
-                const wordVector = buildVector(normalizedCombined.split(/\s+/).filter(Boolean));
-                const similarityScore = cosineSimilarity(queryVector, wordVector);
-                const containsQuery = normalizedCombined.includes(normalizedQuery) ? 1 : 0;
-                const score = Math.max(similarityScore, containsQuery);
-                return { word, score };
-            })
-            .filter(item => item.score > 0)
-            .sort((a, b) => b.score - a.score)
-            .map(item => item.word);
 
-        res.json(scored);
+        const matches = words.filter(word => {
+            const combined = [word.english, word.german, word.vietnamese].join(' ');
+            const normalizedCombined = normalize(combined);
+            return normalizedCombined.includes(normalizedQuery);
+        });
+
+        res.json(matches);
     });
 };
